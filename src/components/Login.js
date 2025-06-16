@@ -3,7 +3,7 @@ import React from 'react';
 // Diese Funktion startet den Tailscale OAuth Login-Flow
 const handleLogin = () => {
     const tailscaleClientId = 'k8MUSD6zQN11CNTRL'; // Ihre Tailscale Client ID
-    const redirectUri = 'http://localhost:3000/auth/callback'; // Muss mit der Einstellung bei Tailscale übereinstimmen
+    const redirectUri = 'https://rhocore.taild298ed.ts.net/auth/callback'; // Muss mit der Einstellung bei Tailscale übereinstimmen
     const scopes = 'users:read'; // Wir benötigen die Profil-Daten (E-Mail)
     
     const authUrl = `https://controlplane.tailscale.com/api/v2/oauth/authorize?response_type=code&client_id=${tailscaleClientId}&scope=${scopes}&redirect_uri=${redirectUri}`;
