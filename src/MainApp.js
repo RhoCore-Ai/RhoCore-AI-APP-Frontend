@@ -1,30 +1,54 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import ClusterManagement from './components/ClusterManagement';
 import WalletResults from './components/WalletResults';
 import Settings from './components/Settings';
 import TabBar from './components/TabBar';
+import { getStatus } from './api';
 
 function MainApp({ onLogout }) {
   const [currentTab, setCurrentTab] = useState('dashboard');
-  
+  const [appState, setAppState] = useState(null);
+
+  useEffect(() => {
+    const pollStatus = async () => {
+      try {
+        const state = await getStatus();
+        setAppState(state);
+      } catch (err) {
+        console.error("Fehler beim Abrufen des Status:", err);
+        // Optional: Setzen Sie einen Fehlerzustand, um ihn in der UI anzuzeigen
+        setAppState({ status: 'error', error: 'Verbindung zum Backend fehlgeschlagen.' });
+      }
+    };
+
+    pollStatus(); // Sofortiger Aufruf beim Laden
+    const interval = setInterval(pollStatus, 8000); // Alle 8 Sekunden pollen
+    return () => clearInterval(interval); // Aufräumen, wenn die Komponente verlässt
+  }, []);
+
   const renderContent = () => {
+    if (!appState) {
+      return <div style={{padding: '20px'}}>Lade Server-Status...</div>;
+    }
+
     switch (currentTab) {
-      case 'dashboard': return <Dashboard />;
-      case 'cluster': return <ClusterManagement />;
+      case 'dashboard': return <Dashboard appState={appState} />;
+      case 'cluster': return <ClusterManagement appState={appState} />;
       case 'wallet': return <WalletResults />;
       case 'settings': return <Settings />;
-      default: return <Dashboard />;
+      default: return <Dashboard appState={appState} />;
     }
   };
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-       {/* Hier könnte ein Header mit einem Logout-Button sein */}
       <div style={{ flex: 1, overflow: 'auto' }}>
         {renderContent()}
       </div>
-      <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
+      {appState && appState.status === 'running' && (
+        <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
+      )}
     </div>
   );
 }

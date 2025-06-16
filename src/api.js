@@ -54,3 +54,15 @@ export async function terminate() {
     return resp.json();
 }
 
+function authHeader() {
+  const token = localStorage.getItem('token');
+  return token ? { Authorization: `Bearer ${token}` } : {};
+}
+
+export async function getStatus() {
+  const resp = await fetch(`${BACKEND_BASE}/api/status`, {
+    headers: authHeader()
+  });
+  if (!resp.ok) throw new Error('Status laden fehlgeschlagen');
+  return resp.json();
+}
