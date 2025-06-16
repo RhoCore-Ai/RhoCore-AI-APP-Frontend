@@ -1,7 +1,6 @@
 import React from 'react';
 
 function ClusterManagement({ appState }) {
-  // Verwenden Sie appState direkt, mit Standardwerten für die Sicherheit
   const vastInfo = appState && appState.vastInstanceInfo ? appState.vastInstanceInfo : {};
   const {
     active_gpus: activeGpus = 0,
@@ -9,12 +8,10 @@ function ClusterManagement({ appState }) {
     total_cost: estCost = 0
   } = vastInfo;
 
-  // Die 'clusters' Information ist im neuen Backend-Modell nicht direkt verfügbar.
-  // Wir können hier Platzhalter oder andere relevante Daten aus appState anzeigen.
   const clusters = vastInfo.id ? [{
       gpuDesc: vastInfo.gpu_name,
       status: vastInfo.actual_status,
-      processedDPs: vastInfo.id // Beispiel-Daten
+      processedDPs: vastInfo.id
   }] : [];
 
   return (

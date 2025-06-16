@@ -17,14 +17,13 @@ function MainApp({ onLogout }) {
         setAppState(state);
       } catch (err) {
         console.error("Fehler beim Abrufen des Status:", err);
-        // Optional: Setzen Sie einen Fehlerzustand, um ihn in der UI anzuzeigen
         setAppState({ status: 'error', error: 'Verbindung zum Backend fehlgeschlagen.' });
       }
     };
 
-    pollStatus(); // Sofortiger Aufruf beim Laden
-    const interval = setInterval(pollStatus, 8000); // Alle 8 Sekunden pollen
-    return () => clearInterval(interval); // Aufräumen, wenn die Komponente verlässt
+    pollStatus();
+    const interval = setInterval(pollStatus, 8000);
+    return () => clearInterval(interval);
   }, []);
 
   const renderContent = () => {
