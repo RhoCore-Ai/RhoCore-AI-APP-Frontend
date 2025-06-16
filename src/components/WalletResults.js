@@ -1,27 +1,18 @@
-import React, { useState, useEffect } from 'react';
-import { fetchResults } from '../api';
+// frontend/src/components/WalletResults.js
 
-function WalletResults() {
-  const [data, setData] = useState({ totalBalance: 0, entries: [] });
-  useEffect(() => {
-    let iv;
-    async function poll() {
-      try {
-        const res = await fetchResults();
-        setData(res);
-      } catch {}
-    }
-    poll();
-    iv = setInterval(poll, 10000);
-    return () => clearInterval(iv);
-  }, []);
+import React from 'react'; // Nur noch React wird importiert
+
+function WalletResults({ appState }) { // Nimmt den globalen appState entgegen
+  // Greift auf die Ergebnisse aus dem appState zu, mit Sicherheitsprüfung
+  const results = (appState && appState.results) ? appState.results : { totalBalance: 0, entries: [] };
+  const { totalBalance, entries } = results;
 
   return (
     <div style={{ padding: 16 }}>
       <h2>Wallet & Results</h2>
-      <p>Total Wallet Balance: Σ {data.totalBalance} BTC</p>
+      <p>Total Wallet Balance: Σ {totalBalance} BTC</p>
       <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
-        {data.entries.map((e, idx) => (
+        {entries.map((e, idx) => (
           <div key={idx} style={{ borderBottom: '1px solid #ddd', padding: 8 }}>
             <p>Address: {e.address}</p>
             <p>Balance: {e.balance} BTC</p>

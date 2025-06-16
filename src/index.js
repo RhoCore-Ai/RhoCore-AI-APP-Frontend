@@ -4,6 +4,8 @@ import App from './App';
 import { BrowserRouter } from 'react-router-dom';
 
 const root = ReactDOM.createRoot(document.getElementById('root'));
+
+// Der BrowserRouter bleibt erhalten, um die App für zukünftige Routing-Anforderungen vorzubereiten.
 root.render(
   <BrowserRouter>
     <App />

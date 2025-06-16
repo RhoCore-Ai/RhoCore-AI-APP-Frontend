@@ -1,29 +1,42 @@
-import React, { useState } from 'react';
-import { Routes, Route, Navigate } from 'react-router-dom';
-import Login from './components/Login';
-import AuthCallback from './components/AuthCallback';
-import MainApp from './MainApp'; // Wir lagern die Haupt-App aus
+import React, { useState, useEffect } from 'react';
+import MainApp from './MainApp';
+import { authenticate } from './api';
 
 function App() {
-  // Dieser State hilft, nach dem Login die Seite neu zu rendern
-  const [isAuthenticated, setIsAuthenticated] = useState(!!localStorage.getItem('token'));
+  const [authStatus, setAuthStatus] = useState('pending'); // 'pending', 'success', 'failed'
+  const [error, setError] = useState('');
 
-  const handleLogin = () => {
-    setIsAuthenticated(true);
-  };
+  useEffect(() => {
+    // Versucht, eine Sitzung zu bekommen, sobald die App lädt
+    authenticate()
+      .then(() => {
+        setAuthStatus('success');
+      })
+      .catch(err => {
+        setError(err.message);
+        setAuthStatus('failed');
+      });
+  }, []);
 
-  const handleLogout = () => {
-      localStorage.removeItem('token');
-      setIsAuthenticated(false);
+  if (authStatus === 'pending') {
+    return <div style={{padding: '40px', textAlign: 'center'}}>Authenticating with Tailscale...</div>;
   }
 
-  return (
-    <Routes>
-      <Route path="/login" element={!isAuthenticated ? <Login /> : <Navigate to="/" />} />
-      <Route path="/auth/callback" element={<AuthCallback onLogin={handleLogin} />} />
-      <Route path="/*" element={isAuthenticated ? <MainApp onLogout={handleLogout} /> : <Navigate to="/login" />} />
-    </Routes>
-  );
+  if (authStatus === 'failed') {
+    return (
+        <div style={{padding: '40px', textAlign: 'center', color: 'red'}}>
+            <h2>Authentication Failed</h2>
+            <p>{error}</p>
+            <p>Please ensure you are connected to the correct Tailscale network.</p>
+        </div>
+    );
+  }
+
+  // Wenn die Authentifizierung erfolgreich war, zeige die Haupt-App
+  return <MainApp onLogout={() => {
+      localStorage.removeItem('token');
+      window.location.reload(); // Seite neu laden, um den Auth-Prozess neu zu starten
+  }}/>;
 }
 
 export default App;

@@ -1,7 +1,9 @@
+// frontend/src/MainApp.js
+
 import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import ClusterManagement from './components/ClusterManagement';
-//import WalletResults from './components/WalletResults';
+import WalletResults from './components/WalletResults'; // <-- WIEDER IMPORTIEREN
 import Settings from './components/Settings';
 import TabBar from './components/TabBar';
 import { getStatus } from './api';
@@ -34,7 +36,7 @@ function MainApp({ onLogout }) {
     switch (currentTab) {
       case 'dashboard': return <Dashboard appState={appState} />;
       case 'cluster': return <ClusterManagement appState={appState} />;
-      case 'wallet': return <WalletResults />;
+      case 'wallet': return <WalletResults appState={appState} />; // <-- WIEDER HINZUFÜGEN
       case 'settings': return <Settings />;
       default: return <Dashboard appState={appState} />;
     }
@@ -45,7 +47,7 @@ function MainApp({ onLogout }) {
       <div style={{ flex: 1, overflow: 'auto' }}>
         {renderContent()}
       </div>
-      {appState && appState.status === 'running' && (
+      {appState && appState.status !== 'error' && (
         <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
       )}
     </div>

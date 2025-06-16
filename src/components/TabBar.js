@@ -4,7 +4,7 @@ function TabBar({ currentTab, onTabChange }) {
   const tabs = [
     { key: 'dashboard', label: 'Dashboard' },
     { key: 'cluster', label: 'Cluster' },
-   // { key: 'wallet', label: 'Wallet' },
+   { key: 'wallet', label: 'Wallet' },
     { key: 'settings', label: 'Settings' },
   ];
   return (
