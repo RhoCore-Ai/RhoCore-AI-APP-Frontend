@@ -1,9 +1,7 @@
-// frontend/src/MainApp.js
-
 import React, { useState, useEffect } from 'react';
 import Dashboard from './components/Dashboard';
 import ClusterManagement from './components/ClusterManagement';
-import WalletResults from './components/WalletResults'; // <-- WIEDER IMPORTIEREN
+import WalletResults from './components/WalletResults';
 import Settings from './components/Settings';
 import TabBar from './components/TabBar';
 import { getStatus } from './api';
@@ -18,11 +16,10 @@ function MainApp({ onLogout }) {
         const state = await getStatus();
         setAppState(state);
       } catch (err) {
-        console.error("Fehler beim Abrufen des Status:", err);
-        setAppState({ status: 'error', error: 'Verbindung zum Backend fehlgeschlagen.' });
+        console.error("Status fetch error:", err);
+        setAppState({ status: 'error', error: err.message });
       }
     };
-
     pollStatus();
     const interval = setInterval(pollStatus, 8000);
     return () => clearInterval(interval);
@@ -32,11 +29,14 @@ function MainApp({ onLogout }) {
     if (!appState) {
       return <div style={{padding: '20px'}}>Lade Server-Status...</div>;
     }
+    if (appState.status === 'error') {
+        return <div style={{padding: '20px', color: 'red'}}>Error: {appState.error}</div>;
+    }
 
     switch (currentTab) {
       case 'dashboard': return <Dashboard appState={appState} />;
       case 'cluster': return <ClusterManagement appState={appState} />;
-      case 'wallet': return <WalletResults appState={appState} />; // <-- WIEDER HINZUFÜGEN
+      case 'wallet': return <WalletResults appState={appState} />;
       case 'settings': return <Settings />;
       default: return <Dashboard appState={appState} />;
     }
@@ -44,12 +44,11 @@ function MainApp({ onLogout }) {
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
+       <button onClick={onLogout} style={{position: 'absolute', top: 10, right: 10, zIndex: 100}}>Logout</button>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {renderContent()}
       </div>
-      {appState && appState.status !== 'error' && (
-        <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
-      )}
+      <TabBar currentTab={currentTab} onTabChange={setCurrentTab} />
     </div>
   );
 }

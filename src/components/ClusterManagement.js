@@ -11,7 +11,7 @@ function ClusterManagement({ appState }) {
   const clusters = vastInfo.id ? [{
       gpuDesc: vastInfo.gpu_name,
       status: vastInfo.actual_status,
-      processedDPs: vastInfo.id
+      id: vastInfo.id
   }] : [];
 
   return (
@@ -20,12 +20,12 @@ function ClusterManagement({ appState }) {
       <p>Active GPUs: {activeGpus} / {targetGpus} Online</p>
       <p>Estimated Cost/hr: ${estCost}</p>
       <div style={{ maxHeight: '60vh', overflow: 'auto' }}>
-        {clusters.map((cl, idx) => (
+        {clusters.length > 0 ? clusters.map((cl, idx) => (
           <div key={idx} style={{ border: '1px solid #ccc', marginBottom: 8, padding: 8 }}>
             <p>Cluster #{idx+1} ({cl.gpuDesc}): Status: {cl.status}</p>
-            <p>Instance ID: {cl.processedDPs}</p>
+            <p>Instance ID: {cl.id}</p>
           </div>
-        ))}
+        )) : <p>No active cluster information available.</p>}
       </div>
     </div>
   );

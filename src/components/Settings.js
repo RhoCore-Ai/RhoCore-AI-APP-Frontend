@@ -1,26 +1,26 @@
 import React, { useState } from 'react';
 import { saveSettings } from '../api';
 
-function Settings({ onSaved, forceOnly = false }) {
+function Settings() {
   const [dockerUser, setDockerUser] = useState('');
   const [dockerPass, setDockerPass] = useState('');
   const [vastApiKey, setVastApiKey] = useState('');
   const [isSaving, setIsSaving] = useState(false);
+  const [message, setMessage] = useState('');
 
   const handleSave = async () => {
     if (!dockerUser || !dockerPass || !vastApiKey) {
-        alert('Bitte alle Felder ausfüllen.');
+        setMessage('Error: Please fill in all fields.');
         return;
     }
     setIsSaving(true);
+    setMessage('');
     try {
       await saveSettings(dockerUser, dockerPass, vastApiKey);
-      localStorage.setItem('settingsSaved', '1');
-      alert('Einstellungen erfolgreich gespeichert.');
-      if (onSaved) onSaved();
+      setMessage('Success: Settings saved.');
     } catch (err) {
       console.error(err);
-      alert('Fehler beim Speichern der Settings.');
+      setMessage(`Error: ${err.message}`);
     } finally {
       setIsSaving(false);
     }
@@ -29,7 +29,7 @@ function Settings({ onSaved, forceOnly = false }) {
   return (
     <div style={{ padding: 16 }}>
       <h2>Settings</h2>
-      <p>Bitte geben Sie hier Ihre API-Keys und Credentials ein. Diese werden benötigt, um den Management-Server automatisch zu provisionieren.</p>
+      <p>Enter your API keys and credentials here. These are stored per session.</p>
       <div style={{ marginBottom: 12 }}>
         <label>Docker Username:</label><br/>
         <input type="text" value={dockerUser} onChange={e => setDockerUser(e.target.value)} style={{ width:'100%', padding: '8px' }}/>
@@ -43,9 +43,9 @@ function Settings({ onSaved, forceOnly = false }) {
         <input type="text" value={vastApiKey} onChange={e => setVastApiKey(e.target.value)} style={{ width:'100%', padding: '8px' }}/>
       </div>
       <button onClick={handleSave} disabled={isSaving}>
-        {isSaving ? 'Speichern...' : 'Speichern'}
+        {isSaving ? 'Saving...' : 'Save Settings'}
       </button>
-      {forceOnly && <p style={{marginTop: '15px'}}>Erst nach erfolgreichem Speichern wird die App freigegeben.</p>}
+      {message && <p style={{marginTop: '15px', color: message.startsWith('Error') ? 'red' : 'green'}}>{message}</p>}
     </div>
   );
 }

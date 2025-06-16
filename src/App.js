@@ -7,7 +7,6 @@ function App() {
   const [error, setError] = useState('');
 
   useEffect(() => {
-    // Versucht, eine Sitzung zu bekommen, sobald die App lädt
     authenticate()
       .then(() => {
         setAuthStatus('success');
@@ -27,15 +26,14 @@ function App() {
         <div style={{padding: '40px', textAlign: 'center', color: 'red'}}>
             <h2>Authentication Failed</h2>
             <p>{error}</p>
-            <p>Please ensure you are connected to the correct Tailscale network.</p>
+            <p>Please ensure you are connected to the correct Tailscale network and the backend server is running.</p>
         </div>
     );
   }
 
-  // Wenn die Authentifizierung erfolgreich war, zeige die Haupt-App
   return <MainApp onLogout={() => {
       localStorage.removeItem('token');
-      window.location.reload(); // Seite neu laden, um den Auth-Prozess neu zu starten
+      window.location.reload();
   }}/>;
 }
 
