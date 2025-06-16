@@ -1,43 +1,41 @@
-const BACKEND_BASE = process.env.REACT_APP_BACKEND_BASE || 'http://localhost:3001';
+import React from 'react';
 
-// Diese Funktion startet die gesamte Authentifizierung.
-export async function authenticate() {
-  const resp = await fetch(`${BACKEND_BASE}/api/auth/session`);
+// Das Dashboard ist jetzt eine reine Anzeige-Komponente.
+function Dashboard({ appState }) {
 
-  if (!resp.ok) {
-    const data = await resp.json().catch(() => ({ error: 'Authentication failed. Check backend connection.' }));
-    throw new Error(data.error);
+  // Sicherheitsprüfung, falls appState noch nicht geladen ist.
+  if (!appState) {
+    return <div style={{padding: 16}}>Loading dashboard...</div>;
   }
 
-  const data = await resp.json();
-  if (data.token) {
-    localStorage.setItem('token', data.token);
-  } else {
-    throw new Error('Token not received from backend.');
-  }
+  const { status, user, error, vastInstanceInfo, uptime } = appState;
+  const isRunning = status === 'running';
+
+  return (
+    <div style={{ padding: 16 }}>
+      <h2>Dashboard</h2>
+      <p>Welcome, {user ? user.email : 'User'}.</p>
+      
+      <div style={{ marginTop: '20px', padding: '15px', border: '1px solid #ccc', borderRadius: '8px' }}>
+        <p><strong>Server Status:</strong> {status}</p>
+        
+        {isRunning && vastInstanceInfo ? (
+          <>
+            <p><strong>Uptime:</strong> {uptime}</p>
+            <p><strong>GPU:</strong> {vastInstanceInfo.gpu_name || 'N/A'}</p>
+            <p><strong>Host:</strong> {vastInstanceInfo.ssh_host || 'N/A'}</p>
+          </>
+        ) : (
+          <p>No active cluster information available.</p>
+        )}
+
+        {error && <p style={{ color: 'red' }}><strong>Last Error:</strong> {error}</p>}
+      </div>
+      
+      {/* Der Button zum Stoppen wird entfernt, da die Funktion in der API nicht mehr existiert. */}
+      {/* Sie können hier später wieder eine Funktion zum Stoppen hinzufügen, wenn sie im Backend implementiert ist. */}
+    </div>
+  );
 }
 
-// Interne Funktion, um den Auth-Header zu erstellen.
-function authHeader() {
-  const token = localStorage.getItem('token');
-  if (!token) throw new Error("No auth token found. Please re-authenticate.");
-  return { Authorization: `Bearer ${token}` };
-}
-
-// Ruft den Gesamtstatus der Anwendung vom Backend ab.
-export async function getStatus() {
-  const resp = await fetch(`${BACKEND_BASE}/api/status`, { headers: authHeader() });
-  if (!resp.ok) throw new Error('Failed to fetch status.');
-  return resp.json();
-}
-
-// Speichert die API-Keys und Credentials in der aktuellen Sitzung.
-export async function saveSettings(dockerUser, dockerPass, vastApiKey) {
-  const resp = await fetch(`${BACKEND_BASE}/api/settings`, {
-    method: 'POST',
-    headers: { ...authHeader(), 'Content-Type': 'application/json' },
-    body: JSON.stringify({ dockerUser, dockerPass, vastApiKey })
-  });
-  if (!resp.ok) throw new Error('Failed to save settings.');
-  return resp.json();
-}
+export default Dashboard;

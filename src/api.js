@@ -1,11 +1,14 @@
 const BACKEND_BASE = process.env.REACT_APP_BACKEND_BASE || 'http://localhost:3001';
 
+// Diese Funktion startet die gesamte Authentifizierung.
 export async function authenticate() {
   const resp = await fetch(`${BACKEND_BASE}/api/auth/session`);
+
   if (!resp.ok) {
     const data = await resp.json().catch(() => ({ error: 'Authentication failed. Check backend connection.' }));
     throw new Error(data.error);
   }
+
   const data = await resp.json();
   if (data.token) {
     localStorage.setItem('token', data.token);
@@ -14,18 +17,21 @@ export async function authenticate() {
   }
 }
 
+// Interne Funktion, um den Auth-Header zu erstellen.
 function authHeader() {
   const token = localStorage.getItem('token');
   if (!token) throw new Error("No auth token found. Please re-authenticate.");
   return { Authorization: `Bearer ${token}` };
 }
 
+// Ruft den Gesamtstatus der Anwendung vom Backend ab.
 export async function getStatus() {
   const resp = await fetch(`${BACKEND_BASE}/api/status`, { headers: authHeader() });
   if (!resp.ok) throw new Error('Failed to fetch status.');
   return resp.json();
 }
 
+// Speichert die API-Keys und Credentials in der aktuellen Sitzung.
 export async function saveSettings(dockerUser, dockerPass, vastApiKey) {
   const resp = await fetch(`${BACKEND_BASE}/api/settings`, {
     method: 'POST',
