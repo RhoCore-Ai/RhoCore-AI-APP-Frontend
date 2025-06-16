@@ -28,7 +28,7 @@ function authHeader() {
 export async function saveSettings(dockerUser, dockerPass, vastApiKey) {
   const resp = await fetch(`${BACKEND_BASE}/api/settings`, {
     method: 'POST',
-    headers: { ...authHeader(), 'Content-Type': 'application/json' },
+    headers: { ...authHeader(), 'Content-Type': 'application/json' }, // WICHTIG: authHeader() hier hinzufügen
     body: JSON.stringify({ dockerUser, dockerPass, vastApiKey })
   });
   if (!resp.ok) throw new Error('Settings speichern fehlgeschlagen');
