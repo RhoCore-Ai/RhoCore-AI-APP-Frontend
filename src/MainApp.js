@@ -6,9 +6,14 @@ import Settings from './components/Settings';
 import TabBar from './components/TabBar';
 import { getStatus } from './api';
 
-function MainApp({ onLogout }) {
+function MainApp() {
   const [currentTab, setCurrentTab] = useState('dashboard');
   const [appState, setAppState] = useState(null);
+
+  const handleLogout = () => {
+    localStorage.removeItem('token');
+    window.location.reload();
+  };
 
   useEffect(() => {
     const pollStatus = async () => {
@@ -17,6 +22,9 @@ function MainApp({ onLogout }) {
         setAppState(state);
       } catch (err) {
         console.error("Status fetch error:", err);
+        if (err.message.includes('token')) {
+          handleLogout();
+        }
         setAppState({ status: 'error', error: err.message });
       }
     };
@@ -44,7 +52,7 @@ function MainApp({ onLogout }) {
 
   return (
     <div className="app-container" style={{ display: 'flex', flexDirection: 'column', height: '100vh' }}>
-       <button onClick={onLogout} style={{position: 'absolute', top: 10, right: 10, zIndex: 100}}>Logout</button>
+       <button onClick={handleLogout} style={{position: 'absolute', top: 10, right: 10, zIndex: 100}}>Logout</button>
       <div style={{ flex: 1, overflow: 'auto' }}>
         {renderContent()}
       </div>

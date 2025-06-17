@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import MainApp from './MainApp';
+import Logo from './components/Logo';
 import { authenticate } from './api';
 
 function App() {
@@ -18,7 +19,7 @@ function App() {
   }, []);
 
   if (authStatus === 'pending') {
-    return <div style={{padding: '40px', textAlign: 'center'}}>Authenticating with Tailscale...</div>;
+    return <Logo />;
   }
 
   if (authStatus === 'failed') {
@@ -31,10 +32,7 @@ function App() {
     );
   }
 
-  return <MainApp onLogout={() => {
-      localStorage.removeItem('token');
-      window.location.reload();
-  }}/>;
+  return <MainApp />;
 }
 
 export default App;
